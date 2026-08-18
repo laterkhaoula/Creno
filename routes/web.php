@@ -28,6 +28,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
 
+    // Mes rendez-vous
+    Route::get('/rendez-vous', [RendezVousController::class, 'index'])
+        ->name('rendez-vous.index');
+
     // Réserver un créneau
     Route::post('/rendez-vous', [RendezVousController::class, 'store'])
         ->name('rendez-vous.store');
@@ -35,6 +39,12 @@ Route::middleware('auth')->group(function () {
     // Annuler un rendez-vous
     Route::delete('/rendez-vous/{rendezVous}', [RendezVousController::class, 'destroy'])
         ->name('rendez-vous.destroy');
+});
+
+Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+    Route::patch('/rendez-vous/{rendezVous}/status', [\App\Http\Controllers\Admin\DashboardController::class, 'updateStatus'])->name('rendez-vous.update-status');
+    Route::resource('creneaux', \App\Http\Controllers\Admin\CreneauController::class);
 });
 
 require __DIR__.'/auth.php';

@@ -8,6 +8,19 @@ use App\Models\RendezVous;
 
 class RendezVousController extends Controller
 {
+    public function index()
+    {
+        $rendezVousList = RendezVous::where('user_id', auth()->id())
+            ->with('creneau')
+            ->join('creneaus', 'rendez_vouses.creneau_id', '=', 'creneaus.id')
+            ->orderBy('creneaus.date', 'desc')
+            ->orderBy('creneaus.heure_debut', 'desc')
+            ->select('rendez_vouses.*')
+            ->get();
+
+        return view('rendez-vous.index', compact('rendezVousList'));
+    }
+
     public function store(StoreRendezVousRequest $request)
     {
         $creneau = Creneau::findOrFail($request->creneau_id);

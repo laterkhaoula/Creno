@@ -229,4 +229,29 @@ class RendezVousTest extends TestCase
             'statut' => 'en_attente',
         ]);
     }
+
+    /**
+     * Un client peut voir la liste de ses propres rendez-vous.
+     */
+    public function test_client_can_view_his_rendez_vous(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'client',
+        ]);
+
+        $creneau = Creneau::factory()->create();
+
+        RendezVous::factory()->create([
+            'user_id' => $user->id,
+            'creneau_id' => $creneau->id,
+            'statut' => 'en_attente',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('rendez-vous.index'));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('rendez-vous.index');
+        $response->assertViewHas('rendezVousList');
+        $response->assertSee('En attente');
+    }
 }
